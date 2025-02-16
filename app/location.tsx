@@ -26,7 +26,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         await fetch(api + '/update-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude, longitude }),
+          body: JSON.stringify({ latitude, longitude,username:"samsung_a20" }),
         });
       } catch (err) {
         console.error('Failed to send location:', err);
@@ -66,10 +66,10 @@ export default function LocationScreen() {
 
       // Start background location updates
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 5000, // Every 5 seconds
-        distanceInterval: 10, // Every 10 meters
-        showsBackgroundLocationIndicator: true,
+        accuracy: Location.Accuracy.BestForNavigation,
+        timeInterval: 100, // Every 5 seconds
+        distanceInterval: 1, // Every 10 meters
+        // showsBackgroundLocationIndicator: true,
       });
     })();
   }, []);

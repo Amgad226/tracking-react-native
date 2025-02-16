@@ -1,5 +1,5 @@
 name: "Build Android App"
-run-name: ${{ github.actor }} is learning build Android App using Github Actions
+run-name: ${{ github.actor }} is learning to build an Android App using GitHub Actions
 on: 
   push:
     branches:
@@ -9,42 +9,42 @@ on:
       - main
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Java 
-        uses: actions/setup-java@v2
+      - name: Install Java
+        uses: actions/setup-java@v3
         with:
           java-version: '20'
           distribution: "adopt"
           cache: "gradle"
 
-      - name: Change wrapper permissions
+      - name: Change Gradle Wrapper Permissions
         run: chmod +x ./android/gradlew
       
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with: 
           node-version: '18'
 
-      - name: Run Yarn Install
+      - name: Install Dependencies
         run: | 
-              npm install -g yarn
-              yarn install
+          npm install -g yarn
+          yarn install --frozen-lockfile
 
-      - name: Build App
+      - name: Build Android APK
         run: |
-              cd ./android
-              ./gradlew assembleRelease
+          cd ./android
+          ./gradlew assembleRelease
 
       - name: Upload APK to Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with: 
-            name: app
-            path: ./android/app/build/outputs/apk/release/app-release.apk
-            retention-days: 3
+          name: app-release
+          path: ./android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 3

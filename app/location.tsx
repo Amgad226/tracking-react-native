@@ -4,7 +4,7 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { useLocalSearchParams } from 'expo-router';
 import { api } from '@/constants/Server';
-import Toast from 'react-native-toast-message'; // Import Toast for notifications
+import Toast from 'react-native-toast-message'; 
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -13,6 +13,7 @@ export default function LocationScreen() {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
 
   useEffect(() => {
     (async () => {
@@ -64,6 +65,7 @@ export default function LocationScreen() {
 // Define background location tracking task
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (error) {
+    
     console.log('Background Location Error:', error);
     return;
   }
@@ -101,30 +103,26 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         }),
       }).catch(e => {
         console.log(e)
-        Toast.show({
-          type: 'error',
-          text1: 'fetch request failed',
-          text2: e?.message ?? "",
-        });
+
       });
 
 
       // Show a toast notification with the new location
-      Toast.show({
-        type: 'success',
-        text1: 'Location Updated',
-        text2: `Lat: ${latitude}, Lng: ${longitude}`,
-        position: 'bottom',
-      });
+      // Toast.show({
+      //   type: 'success',
+      //   text1: 'Location Updated',
+      //   text2: `Lat: ${latitude}, Lng: ${longitude}`,
+      //   position: 'bottom',
+      // });
 
       // setLocation({ latitude, longitude } )
     } catch (error) {
       console.log('Failed to send data:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Location Update Failed',
-        text2: 'Could not send location to server',
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   text1: 'Location Update Failed',
+      //   text2: 'Could not send location to server',
+      // });
     }
   }
 });

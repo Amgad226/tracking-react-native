@@ -19,8 +19,7 @@ jobs:
         with:
           java-version: '20'
           distribution: "adopt"
-          cache: "gradle"
-
+      
       - name: Change Gradle Wrapper Permissions
         run: chmod +x ./android/gradlew
       

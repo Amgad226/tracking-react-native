@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { api } from '@/constants/Server';
 
 export default function UserListScreen() {
     const [usernames, setUsernames] = useState<string[]>([]);
@@ -10,8 +11,7 @@ export default function UserListScreen() {
     useEffect(() => {
         const fetchUsernames = async () => {
             try {
-                // const response = await fetch('http://192.168.43.194:3000//usernames');
-                const response = await fetch('http://192.168.43.194:3000/usernames', {
+                const response = await fetch(`${api}/usernames`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });

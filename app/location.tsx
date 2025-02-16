@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, Button, ActivityIndicator, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { useLocalSearchParams } from 'expo-router';
+import { api } from '@/constants/Server';
 
 export default function LocationScreen() {
   const { username } = useLocalSearchParams();
@@ -9,7 +10,7 @@ export default function LocationScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -29,7 +30,7 @@ export default function LocationScreen() {
     if (!location) return;
     try {
 
-      const response = await fetch('http://192.168.43.194:3000/update-data', {
+      const response = await fetch(api + '/update-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -45,9 +46,9 @@ export default function LocationScreen() {
       alert('Failed to send data');
     }
   };
-setInterval(()=>{
-  sendDataToBackend()
-},1000)
+  setInterval(() => {
+    sendDataToBackend()
+  }, 1000)
   return (
     <View style={styles.container}>
       {loading ? (

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { io } from "socket.io-client";
+import { api } from "@/constants/Server";
 
 let MapView: any;
 let Marker: any;
@@ -26,7 +27,7 @@ export default function UserSocketScreen() {
     longitudeDelta: 6    // Adjust for zoom level
   };
 
-  const socket = useRef(io("http://192.168.43.194:3000")).current;
+  const socket = useRef(io(api)).current;
 
   useEffect(() => {
     // Subscribe to user on socket connection

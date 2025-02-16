@@ -5,8 +5,6 @@ import * as TaskManager from 'expo-task-manager';
 import { useLocalSearchParams } from 'expo-router';
 import { api } from '@/constants/Server';
 import Toast from 'react-native-toast-message'; // Import Toast for notifications
-import EventEmitter from 'events';
-const locationEmitter = new EventEmitter();
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -19,9 +17,7 @@ export default function LocationScreen() {
   useEffect(() => {
     (async () => {
       global.username = username;
-      locationEmitter.addListener('locationUpdated', (newLocation) => {
-        setLocation(newLocation); // Update the state with the new location
-      });
+
       // Request location permissions
       let { status } = await Location.requestForegroundPermissionsAsync();
       let { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
@@ -104,7 +100,6 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
           longitude,
         }),
       });
-      locationEmitter.emit('locationUpdated', { latitude, longitude }); // Trigger state update in component
 
 
       // Show a toast notification with the new location

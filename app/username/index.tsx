@@ -1,14 +1,28 @@
 import { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-
+function makeid(length:number) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
 export default function UsernameScreen() {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('Mobile');
   const router = useRouter();
 
   const handleNext = () => {
+    if(!username){
+        alert('Please enter a username');
+        return 
+    }
     if (username.trim()) {
-      router.push(`/location?username=${username}`);
+      router.push(`/location?username=${username}_${makeid(4)}`);
     } else {
       alert('Please enter a username');
     }
@@ -19,6 +33,7 @@ export default function UsernameScreen() {
       <TextInput
         style={styles.input}
         placeholder="Enter your username"
+        // aria-disabled={true}
         value={username}
         onChangeText={setUsername}
       />

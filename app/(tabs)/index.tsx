@@ -6,9 +6,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Button title="Enter Username" onPress={() => router.push('/username')} />
-      <Button title="View User List" onPress={() => router.push('/usernames')} />
-      <Button title="map" onPress={() => router.push('/map')} />
+      <Button title="Share My GPS" onPress={() => router.push('/username')} />
     </View>
   );
 }

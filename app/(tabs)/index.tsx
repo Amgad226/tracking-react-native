@@ -6,10 +6,12 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Button title="Share My GPS" onPress={() => router.push('/username')} />
+      <Button title="Share My GPS" onPress={() => router.push(`/location?username=samsuang`)} />
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

@@ -1,32 +1,34 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Button, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Button, ActivityIndicator, StyleSheet, TextInput } from 'react-native';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { useLocalSearchParams } from 'expo-router';
 import { api } from '@/constants/Server';
 
 const LOCATION_TASK_NAME = 'background-location-task';
+let count = 0;
 
 // Define the background task
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }: { data: { locations: [{ coords: any, mocked: boolean, timestamp: number }] }, error: any }) => {
   if (error) {
     console.error('Error in background task:', error);
     return;
   }
-
+  console.log("Background Task ", data)
   if (data) {
     const { locations } = data;
     const location = locations[0];
 
     if (location) {
       const { latitude, longitude } = location.coords;
-      console.log('Background location:', latitude, longitude);
+      const timestamp = location.timestamp
+      console.log('Background Task get these coordinates:', latitude, longitude);
 
       try {
-        await fetch(api + '/update-data', {
+        await fetch(api + '/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude, longitude,username:"samsung_a20" }),
+          body: JSON.stringify({ lat: latitude, longitude, username: "samsung", timestamp }),
         });
       } catch (err) {
         console.error('Failed to send location:', err);
@@ -37,12 +39,21 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
 export default function LocationScreen() {
   const { username } = useLocalSearchParams();
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [intervalTime, setIntervalTime] = useState(60000); // Default 1 minute interval
 
   useEffect(() => {
     (async () => {
+      console.log("useEffect")
+      // Check if task is already registered
+      let isRegistered = await TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
+      console.log(`is task registerd ? ${isRegistered}`)
+      if (isRegistered) {
+        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+      }
+
+      console.log(`requestForegroundPermissionsAsync`)
       // Request foreground location permission
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -50,6 +61,7 @@ export default function LocationScreen() {
         setLoading(false);
         return;
       }
+      console.log(`requestBackgroundPermissionsAsync`)
 
       // Request background location permission
       let { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
@@ -59,20 +71,23 @@ export default function LocationScreen() {
         return;
       }
 
-      // Get initial location
-      let loc = await Location.getCurrentPositionAsync({});
-      setLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
-      setLoading(false);
+      console.log(`time intervial to set is : ${intervalTime}`)
 
-      // Start background location updates
+      // Restart background task with the specified interval
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: 100, // Every 5 seconds
-        distanceInterval: 1, // Every 10 meters
-        // showsBackgroundLocationIndicator: true,
+        timeInterval: intervalTime, // Use the interval time state here
+        distanceInterval: 1, // 1 meter
+        foregroundService: {
+          notificationTitle: "Tracking Your Location",
+          notificationBody: "Your location is being used in the background.",
+        },
       });
+
+      setLoading(false);
     })();
-  }, []);
+
+  }, [intervalTime]); // Trigger task restart when intervalTime changes
 
   return (
     <View style={styles.container}>
@@ -83,8 +98,16 @@ export default function LocationScreen() {
       ) : (
         <>
           <Text>Username: {username}</Text>
-          <Text>Latitude: {location?.latitude}</Text>
-          <Text>Longitude: {location?.longitude}</Text>
+
+          <Text>enter time intervial in ms</Text>
+          <TextInput
+            style={styles.input}
+            value={intervalTime.toString()}
+            onChangeText={(text) => setIntervalTime(Number(text))}
+            keyboardType="numeric"
+            placeholder="Set interval (ms)"
+          />
+          <Button title="Update Interval" onPress={() => setIntervalTime(intervalTime)} />
         </>
       )}
     </View>
@@ -101,5 +124,13 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     fontSize: 16,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginTop: 10,
+    width: '80%',
+    textAlign: 'center',
   },
 });

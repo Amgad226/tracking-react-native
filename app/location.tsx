@@ -41,7 +41,7 @@ export default function LocationScreen() {
   const { username } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [intervalTime, setIntervalTime] = useState(60000); // Default 1 minute interval
+  const [intervalTime, setIntervalTime] = useState(1000); // Default 1 minute interval
 
   useEffect(() => {
     (async () => {
@@ -72,6 +72,7 @@ export default function LocationScreen() {
       }
 
       console.log(`time intervial to set is : ${intervalTime}`)
+      setLoading(false);
 
       // Restart background task with the specified interval
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
@@ -84,7 +85,6 @@ export default function LocationScreen() {
         },
       });
 
-      setLoading(false);
     })();
 
   }, [intervalTime]); // Trigger task restart when intervalTime changes

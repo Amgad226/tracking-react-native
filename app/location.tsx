@@ -33,7 +33,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }: { data: { loc
         await fetch(api + '/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude, longitude, speed, battary, timestamp, username: "samsung" }),
+          body: JSON.stringify({ latitude, longitude, speed, battary, timestamp, username: global?.username ?? "samsung" }),
         });
       } catch (err) {
         console.error('Failed to send location:', err);
@@ -51,6 +51,7 @@ export default function LocationScreen() {
   useEffect(() => {
     (async () => {
       console.log("useEffect")
+      global.username = username;
       // Check if task is already registered
       let isRegistered = await TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
       console.log(`is task registerd ? ${isRegistered}`)

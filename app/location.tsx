@@ -5,7 +5,7 @@ import * as TaskManager from 'expo-task-manager';
 import { useLocalSearchParams } from 'expo-router';
 import { api } from '@/constants/Server';
 
-const LOCATION_TASK_NAME = 'background-location-task';
+export const LOCATION_TASK_NAME = 'background-location-task';
 let count = 0;
 
 // Define the background task
@@ -51,6 +51,7 @@ export default function LocationScreen() {
       console.log(`is task registerd ? ${isRegistered}`)
       if (isRegistered) {
         await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        
       }
 
       console.log(`requestForegroundPermissionsAsync`)
@@ -75,6 +76,20 @@ export default function LocationScreen() {
       setLoading(false);
 
       // Restart background task with the specified interval
+       Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 1000, // Use the interval time state here
+        distanceInterval: 1, // 1 meter
+        foregroundService: {
+          notificationTitle: "Tracking Your Location",
+          notificationBody: "Your location is being used in the background.",
+          killServiceOnDestroy: false, // Prevents MIUI from killing the service
+          notificationColor:"#FF00FF"
+        },
+      }).then(()=>{
+        console.log("startLocationUpdatesAsync ok")
+      });
+
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.BestForNavigation,
         timeInterval: intervalTime, // Use the interval time state here
@@ -82,8 +97,10 @@ export default function LocationScreen() {
         foregroundService: {
           notificationTitle: "Tracking Your Location",
           notificationBody: "Your location is being used in the background.",
+          killServiceOnDestroy: false, // Prevents MIUI from killing the service
+          notificationColor:"#FF00FF"
         },
-      });
+      })
 
     })();
 

@@ -20,8 +20,10 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION"
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE"
       ],
+      "foregroundServiceType": "location",
       "package": "com.anonymous.client"
     },
     "web": {
@@ -30,6 +32,13 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Copax to access your location in the background.",
+          "locationWhenInUsePermission": "Allow Copax to access your location while using the app."
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",

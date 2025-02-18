@@ -49,19 +49,19 @@ export default function LocationScreen() {
       setLoading(false);
 
       // Restart background task with the specified interval
-      Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 1000, // Use the interval time state here
-        distanceInterval: 1, // 1 meter
-        foregroundService: {
-          notificationTitle: "Tracking Your Location",
-          notificationBody: "Your location is being used in the background.",
-          killServiceOnDestroy: false, // Prevents MIUI from killing the service
-          notificationColor: "#FF00FF"
-        },
-      }).then(() => {
-        console.log("startLocationUpdatesAsync ok")
-      });
+      // Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+      //   accuracy: Location.Accuracy.High,
+      //   timeInterval: 1000, // Use the interval time state here
+      //   distanceInterval: 1, // 1 meter
+      //   foregroundService: {
+      //     notificationTitle: "Tracking Your Location",
+      //     notificationBody: "Your location is being used in the background.",
+      //     killServiceOnDestroy: false, // Prevents MIUI from killing the service
+      //     notificationColor: "#FF00FF"
+      //   },
+      // }).then(() => {
+      //   console.log("startLocationUpdatesAsync ok")
+      // });
 
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.BestForNavigation,

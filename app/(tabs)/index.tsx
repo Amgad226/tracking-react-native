@@ -4,36 +4,40 @@ import * as TaskManager from 'expo-task-manager';
 import { LOCATION_TASK_NAME } from '../location';
 import { api } from '@/constants/Server';
 import { useState } from 'react';
+import { getPowerState } from "react-native-device-info";
 
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }: { data: { locations: [{ coords: any, mocked: boolean, timestamp: number }] }, error: any }) => {
   if (error) {
-    console.error('Error in background task:', error);
+    console.error('Error in Background task:', error);
     return;
   }
-  // {"locations": [{"coords": [Object], "mocked": false, "timestamp": 1739838350566}]}
-  console.log("Background Task IN index page ")
+  console.log("Background Task Started ")
   if (data) {
     const { locations } = data;
     const location = locations[0];
 
     if (location) {
-      const { latitude, longitude } = location.coords;
+      const { latitude, longitude, speed } = location.coords;
       const timestamp = location.timestamp
-      console.log('Background Task get these coordinates:', latitude, longitude);
 
       try {
+        const powerState = await getPowerState();
+        const battary = powerState.batteryLevel;
+
+        const event = { latitude, longitude, speed, battary, timestamp, username: global?.username ?? "samsung" };
+        console.log("Background Task ", event)
         await fetch(api + '/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lat: latitude, longitude, username: "samsung", timestamp ,indexPage:"IN index page" }),
+          body: JSON.stringify(event),
         });
       } catch (err) {
-        console.error('Failed to send location:', err);
+        console.error('Failed to send location via fetch request:', err);
       }
     }
   }
 });
-function makeid(length:number) {
+function makeid(length: number) {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
@@ -50,7 +54,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-       <TextInput
+      <TextInput
         style={styles.input}
         placeholder="Enter your username"
         value={username}

@@ -1,46 +1,13 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Button, ActivityIndicator, StyleSheet, TextInput } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TextInput } from 'react-native';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { useLocalSearchParams } from 'expo-router';
-import { api } from '@/constants/Server';
-import { getPowerState } from "react-native-device-info";
 
 export const LOCATION_TASK_NAME = 'background-location-task';
 
 // Define the background task
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }: { data: { locations: [{ coords: any, mocked: boolean, timestamp: number }] }, error: any }) => {
-  if (error) {
-    console.error('Error in background task:', error);
-    return;
-  }
-  console.log("Background Task Started ")
-  if (data) {
-    const { locations } = data;
-    const location = locations[0];
 
-    if (location) {
-      const { latitude, longitude, speed } = location.coords;
-      const timestamp = location.timestamp
-      console.log('Background Task get these coordinates:', latitude, longitude);
-
-      try {
-        const powerState = await getPowerState();
-        const battary = powerState.batteryLevel;
-        console.log('battary:' + battary);
-
-
-        await fetch(api + '/update', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude, longitude, speed, battary, timestamp, username: global?.username ?? "samsung" }),
-        });
-      } catch (err) {
-        console.error('Failed to send location:', err);
-      }
-    }
-  }
-});
 
 export default function LocationScreen() {
   const { username } = useLocalSearchParams();

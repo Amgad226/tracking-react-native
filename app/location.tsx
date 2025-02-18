@@ -4,9 +4,9 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { useLocalSearchParams } from 'expo-router';
 import { api } from '@/constants/Server';
+import { getPowerState } from "react-native-device-info";
 
 export const LOCATION_TASK_NAME = 'background-location-task';
-let count = 0;
 
 // Define the background task
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }: { data: { locations: [{ coords: any, mocked: boolean, timestamp: number }] }, error: any }) => {
@@ -14,21 +14,26 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }: { data: { loc
     console.error('Error in background task:', error);
     return;
   }
-  console.log("Background Task ", data)
+  console.log("Background Task Started ")
   if (data) {
     const { locations } = data;
     const location = locations[0];
 
     if (location) {
-      const { latitude, longitude } = location.coords;
+      const { latitude, longitude, speed } = location.coords;
       const timestamp = location.timestamp
       console.log('Background Task get these coordinates:', latitude, longitude);
 
       try {
+        const powerState = await getPowerState();
+        const battary = powerState.batteryLevel;
+        console.log('battary:' + battary);
+
+
         await fetch(api + '/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lat: latitude, longitude, username: "samsung", timestamp }),
+          body: JSON.stringify({ latitude, longitude, speed, battary, timestamp, username: "samsung" }),
         });
       } catch (err) {
         console.error('Failed to send location:', err);
@@ -51,7 +56,7 @@ export default function LocationScreen() {
       console.log(`is task registerd ? ${isRegistered}`)
       if (isRegistered) {
         await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-        
+
       }
 
       console.log(`requestForegroundPermissionsAsync`)
@@ -76,7 +81,7 @@ export default function LocationScreen() {
       setLoading(false);
 
       // Restart background task with the specified interval
-       Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+      Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.High,
         timeInterval: 1000, // Use the interval time state here
         distanceInterval: 1, // 1 meter
@@ -84,9 +89,9 @@ export default function LocationScreen() {
           notificationTitle: "Tracking Your Location",
           notificationBody: "Your location is being used in the background.",
           killServiceOnDestroy: false, // Prevents MIUI from killing the service
-          notificationColor:"#FF00FF"
+          notificationColor: "#FF00FF"
         },
-      }).then(()=>{
+      }).then(() => {
         console.log("startLocationUpdatesAsync ok")
       });
 
@@ -98,7 +103,7 @@ export default function LocationScreen() {
           notificationTitle: "Tracking Your Location",
           notificationBody: "Your location is being used in the background.",
           killServiceOnDestroy: false, // Prevents MIUI from killing the service
-          notificationColor:"#FF00FF"
+          notificationColor: "#00FF00"
         },
       })
 
@@ -124,7 +129,6 @@ export default function LocationScreen() {
             keyboardType="numeric"
             placeholder="Set interval (ms)"
           />
-          <Button title="Update Interval" onPress={() => setIntervalTime(intervalTime)} />
         </>
       )}
     </View>

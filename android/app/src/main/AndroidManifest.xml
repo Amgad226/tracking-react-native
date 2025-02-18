@@ -30,6 +30,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
         <data android:scheme="com.anonymous.client"/>
+        <data android:scheme="exp+gps-tracker"/>
       </intent-filter>
     </activity>
   </application>

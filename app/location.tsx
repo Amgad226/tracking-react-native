@@ -17,6 +17,7 @@ export default function LocationScreen() {
   const [locationData, setLocationData] = useState({});
 
   const [isGreen, setIsGreen] = useState(false);
+  const [counter, setCounter] = useState(0);
 
   // Function to toggle the circle color to green for 1 second
   const makeGreen = () => {
@@ -30,6 +31,7 @@ export default function LocationScreen() {
   useEffect(() => {
     const locationCallback = (newLocation: { latitude: number; longitude: number; speed: number }) => {
       makeGreen()
+      setCounter((prevCounter) => prevCounter + 1);
       setLocationData(newLocation);
     };
     // Assign the callback to global or some global state
@@ -122,6 +124,7 @@ export default function LocationScreen() {
           { backgroundColor: isGreen ? 'green' : 'black' },
         ]}
       />
+      <Text>counter:  {counter}</Text>
           <Text>enter time intervial in ms</Text>
           <TextInput
             style={styles.input}

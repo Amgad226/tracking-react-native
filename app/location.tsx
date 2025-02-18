@@ -14,7 +14,32 @@ export default function LocationScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [intervalTime, setIntervalTime] = useState(1000); // Default 1 minute interval
+  const [locationData, setLocationData] = useState({});
 
+  const [isGreen, setIsGreen] = useState(false);
+
+  // Function to toggle the circle color to green for 1 second
+  const makeGreen = () => {
+    setIsGreen(true);
+    setTimeout(() => {
+      setIsGreen(false); // Revert back to black after 1 second
+    }, 1000);
+  };
+
+  // Update the state when the location changes
+  useEffect(() => {
+    const locationCallback = (newLocation: { latitude: number; longitude: number; speed: number }) => {
+      makeGreen()
+      setLocationData(newLocation);
+    };
+    // Assign the callback to global or some global state
+    global.locationCallback = locationCallback;
+
+    return () => {
+      // Clean up the callback when the component is unmounted
+      global.locationCallback = null;
+    };
+  }, []);
   useEffect(() => {
     (async () => {
       console.log("useEffect")
@@ -88,7 +113,15 @@ export default function LocationScreen() {
       ) : (
         <>
           <Text>Username: {username}</Text>
-
+          <Text>Latitude: {locationData.latitude}</Text>
+          <Text>Longitude: {locationData.longitude}</Text>
+          <Text>Speed: {locationData.speed}</Text>
+          <View
+        style={[
+          styles.circle,
+          { backgroundColor: isGreen ? 'green' : 'black' },
+        ]}
+      />
           <Text>enter time intervial in ms</Text>
           <TextInput
             style={styles.input}
@@ -121,5 +154,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: '80%',
     textAlign: 'center',
+  },
+  circle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // Make it a circle
   },
 });

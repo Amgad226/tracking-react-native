@@ -23,8 +23,10 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }: { data: { loc
       try {
         const powerState = await getPowerState();
         const battary = powerState.batteryLevel;
-
-        const event = { latitude, longitude, speed, battary, timestamp, username: global?.username ?? "samsung" };
+        if (global.locationCallback) {
+          global.locationCallback({ latitude, longitude, speed });
+        }
+        const event = { latitude, longitude, speed, battary:battary, timestamp, username: global?.username ?? "samsung" };
         console.log("Background Task ", event)
         await fetch(api + '/update', {
           method: 'POST',
@@ -51,12 +53,15 @@ function makeid(length: number) {
 export default function HomeScreen() {
   const router = useRouter();
   const [username, setUsername] = useState('Mobile');
-
+  setTimeout(() => {
+    
+    router.push(`/location?username=${username}_${makeid(4)}`)
+  }, 2000);
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        placeholder="Enter your username"
+        placeholder="Enter yousr username"
         value={username}
         onChangeText={setUsername}
       />
